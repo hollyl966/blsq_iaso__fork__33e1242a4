@@ -181,29 +181,12 @@ export const RoundVaccinesForm: FunctionComponent<Props> = ({
         vaccines.length,
     ]);
 
-    // Add second vaccine row when adding a row over an empty first row
-    // Making this a separate effect to avoid disrupting the autofill of ReportDelays
+    // Add a vaccine if vaccines are empty
     useEffect(() => {
-        const currentVaccine = vaccines[0];
-        if (
-            vaccines.length === 1 &&
-            !currentVaccine.name &&
-            !currentVaccine.wastage_ratio_forecast &&
-            !currentVaccine.doses_per_vial &&
-            !HcDelay && // checking if ReportDelay has been autofilled to avoid recreating deleted vaccine row
-            !DistrictDelay &&
-            !RegionDelay
-        ) {
-            setFieldValue(`rounds[${roundIndex}].vaccines`, [...vaccines, {}]);
+        if (!vaccines || vaccines.length === 0) {
+            setFieldValue(`rounds[${roundIndex}].vaccines`, [{}]);
         }
-    }, [
-        DistrictDelay,
-        HcDelay,
-        RegionDelay,
-        roundIndex,
-        setFieldValue,
-        vaccines,
-    ]);
+    }, [roundIndex, setFieldValue, vaccines]);
 
     return (
         <>
@@ -219,15 +202,6 @@ export const RoundVaccinesForm: FunctionComponent<Props> = ({
                         />
                     );
                 })}
-            {/* if the condition is on length === 0 the UI will flicker and the field lose focus because of re-render */}
-            {vaccines.length <= 1 && (
-                <RoundVaccineForm
-                    vaccineIndex={0}
-                    roundIndex={roundIndex}
-                    vaccineOptions={polioVaccines}
-                />
-            )}
-
             <Grid
                 container
                 item
